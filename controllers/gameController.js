@@ -8,8 +8,6 @@ import cloudinary from "cloudinary";
 export const getAllGames = catchAsyncError(async (req, res, next) => {
   const keyword = req.query.keyword || "";
   const category = req.query.category || "";
-  
-
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
@@ -51,7 +49,7 @@ export const getAllGames = catchAsyncError(async (req, res, next) => {
 
   export const createGame = catchAsyncError(async (req, res, next) => {
     const { title, description, category, publishBy } = req.body;
-    if (!title || !description || !category || !publishBy)
+    if (!title ||  !category )
       return next(new ErrorHandler("Please add all fields", 400));
   
     const file = req.file;
@@ -73,5 +71,35 @@ export const getAllGames = catchAsyncError(async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Game created successfully",
+    });
+  });
+
+
+  export const getGame = catchAsyncError(async (req, res, next) => {
+    const game = await Game.findById(req.params.id);
+    if (!game) return next(new ErrorHandler("Game not found", 404));
+  
+    game.click += 1;
+    await game.save();
+  
+    res.status(200).json({
+      success: true,
+      game
+    });
+  });
+
+
+  export const deleteGame = catchAsyncError(async (req, res, next) => {
+    const { id } = req.params;
+    const game = await Game.findById(id);
+    if (!game) return next(new ErrorHandler("Game not found", 404));
+  
+    await cloudinary.v2.uploader.destroy(game.poster.public_id);
+  
+    await game.deleteOne();
+  
+    res.status(200).json({
+      success: true,
+      message: "Game deleted successfully",
     });
   });

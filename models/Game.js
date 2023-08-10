@@ -9,7 +9,7 @@ const schema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, "Please enter course title"],
+    required: [false, "Please enter course title"],
     minLength: [20, "Title must be at least 4 characters"],
   },
   draft: {
@@ -49,7 +49,7 @@ const schema = new mongoose.Schema({
   },
   publishBy: {
     type: String,
-    required: true,
+    required: false,
   },
   createdAt: {
     type: Date,
